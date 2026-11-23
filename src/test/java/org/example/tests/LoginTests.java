@@ -39,7 +39,13 @@ public class LoginTests {
         driver.findElement(By.id("login-button")).click();
         String errorText = driver.findElement(By.className("error-message-container")).getText();
         Assert.assertTrue(errorText.contains("do not match"),"Error message should say the credentials do not match, but it was:" + errorText);
+    }
 
-
+    @Test
+    public void emptyUsernameShowsError(){
+        driver.findElement(By.id("password")).sendKeys("secret_sauce1");
+        driver.findElement(By.id("login-button")).click();
+        String errorText = driver.findElement(By.className("error-message-container")).getText();
+        Assert.assertTrue(errorText.contains("Username is required"),"Error message should say the Username is required, but it was:" + errorText);
     }
 }
