@@ -1,6 +1,6 @@
 package org.example.tests;
 
-import org.openqa.selenium.By;
+import org.example.pages.LoginPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.Assert;
@@ -10,11 +10,14 @@ import org.testng.annotations.Test;
 
 public class LoginTests {
     private WebDriver driver;
+    private LoginPage loginPage;
 
     @BeforeMethod
     public void setUp() {
       driver = new ChromeDriver();
-      driver.get("https://www.saucedemo.com/");
+      loginPage = new LoginPage(driver);
+      loginPage.open();
+
     }
 
     @AfterMethod
@@ -25,27 +28,21 @@ public class LoginTests {
     @Test
     public void validLoginOpensProductsPage() {
         // 1. type the username and password, click the login button
-        driver.findElement(By.id("user-name")).sendKeys("standard_user");
-        driver.findElement(By.id("password")).sendKeys("secret_sauce");
-        driver.findElement(By.id("login-button")).click();
-
-        // 2. check the URL (see the assertion below)
+        loginPage.login("standard_user","secret_sauce");
+        // 2. check the URL
         Assert.assertEquals(driver.getCurrentUrl(),"https://www.saucedemo.com/inventory.html");
     }
     @Test
     public void wrongPasswordShowsError(){
-        driver.findElement(By.id("user-name")).sendKeys("standard_user");
-        driver.findElement(By.id("password")).sendKeys("secret_sauce1");
-        driver.findElement(By.id("login-button")).click();
-        String errorText = driver.findElement(By.className("error-message-container")).getText();
+        loginPage.login("standard_user","secret_sauce1");
+        String errorText = loginPage.getErrorMessage();
         Assert.assertTrue(errorText.contains("do not match"),"Error message should say the credentials do not match, but it was:" + errorText);
     }
 
     @Test
     public void emptyUsernameShowsError(){
-        driver.findElement(By.id("password")).sendKeys("secret_sauce1");
-        driver.findElement(By.id("login-button")).click();
-        String errorText = driver.findElement(By.className("error-message-container")).getText();
+        loginPage.login("","secret_sauce1");
+        String errorText = loginPage.getErrorMessage();
         Assert.assertTrue(errorText.contains("Username is required"),"Error message should say the Username is required, but it was:" + errorText);
     }
 }
